@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Actions</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        ul { padding: 0; }
+        li { list-style-type: disc; margin-left: 20px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>GitHub Actions</h1>
+    <h2>Push Events</h2>
+    <ul id="push-events"></ul>
+    <h2>Pull Request Events</h2>
+    <ul id="pull-request-events"></ul>
+    <h2 id="merge-heading" style="display: none;">Merge Events</h2>
+    <ul id="merge-events"></ul>
+
+    <script>
+        async function fetchEvents() {
+            const response = await fetch('/events');
+            const events = await response.json();
+            const pushEventsUl = document.getElementById('push-events');
+            const pullRequestEventsUl = document.getElementById('pull-request-events');
+            const mergeEventsUl = document.getElementById('merge-events');
+            const mergeHeading = document.getElementById('merge-heading');
+
+            pushEventsUl.innerHTML = '';
+            pullRequestEventsUl.innerHTML = '';
+            mergeEventsUl.innerHTML = '';
+
+            let hasMergeEvents = false;
+
+            events.forEach(event => {
+                let text = '';
+                if (event.type === 'PUSH') {
+                    text = `"${event.author}" pushed to "${event.to_branch}" on ${event.timestamp}`;
+                    const eventLi = document.createElement('li');
+                    eventLi.innerText = text;
+                    pushEventsUl.appendChild(eventLi);
+                } else if (event.type === 'PULL_REQUEST') {
+                    text = `"${event.author}" submitted a pull request from "${event.from_branch}" to "${event.to_branch}" on ${event.timestamp}`;
+                    const eventLi = document.createElement('li');
+                    eventLi.innerText = text;
+                    pullRequestEventsUl.appendChild(eventLi);
+                } else if (event.type === 'MERGE') {
+                    text = `"${event.author}" merged branch "${event.from_branch}" to "${event.to_branch}" on ${event.timestamp}`;
+                    const eventLi = document.createElement('li');
+                    eventLi.innerText = text;
+                    mergeEventsUl.appendChild(eventLi);
+                    hasMergeEvents = true; 
+                }
+            });
+
+            if (hasMergeEvents) {
+                mergeHeading.style.display = 'block';
+            } else {
+                mergeHeading.style.display = 'none';
+            }
+        }
+
+        setInterval(fetchEvents, 15000); 
+        fetchEvents(); 
+    </script>
+</body>
+</html>
+
