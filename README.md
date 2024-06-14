@@ -3,6 +3,8 @@
 
 ## Setup
 
-### Create a new virtual environment
+### 1. Create a new virtual environment
+- Install `virtualenv`:
+  ```bash
+  pip install virtualenv
 
-pip install virtualenv
